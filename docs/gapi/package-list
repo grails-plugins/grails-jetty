@@ -1,4 +1,3 @@
 DefaultPackage
-grails-app.conf
 scripts
 src.groovy.org.grails.jetty
