@@ -1,6 +1,6 @@
 class JettyGrailsPlugin {
     // the plugin version
-    def version = "1.1"
+    def version = "1.2-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.2 > *"
 	// scope
@@ -14,7 +14,7 @@ class JettyGrailsPlugin {
     def authorEmail = "graeme.rocher@springsource.com"
     def title = "Jetty Plugin"
     def description = '''\\
-Makes Jetty 6.1.14 the development time container for Grails
+Makes Jetty the development time container for Grails
 '''
 
     // URL to the plugin's documentation
