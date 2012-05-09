@@ -19,23 +19,24 @@ grails.project.dependency.resolution = {
 
 	dependencies {
 		String jettyVersion = '8.1.3.v20120416'
-		compile("org.eclipse.jetty:jetty-server:$jettyVersion",
-		        "org.eclipse.jetty:jetty-webapp:${jettyVersion}",
+		compile("org.eclipse.jetty:jetty-continuation:${jettyVersion}",
 		        "org.eclipse.jetty:jetty-http:${jettyVersion}",
-		        "org.eclipse.jetty:jetty-servlet:${jettyVersion}",
-		        "org.eclipse.jetty:jetty-security:${jettyVersion}",
-		        "org.eclipse.jetty:jetty-plus:$jettyVersion",
-		        "org.eclipse.jetty:jetty-util:$jettyVersion",
 		        "org.eclipse.jetty:jetty-jndi:$jettyVersion",
-		        "org.eclipse.jetty:jetty-continuation:${jettyVersion}",
-		        "org.eclipse.jetty:jetty-websocket:${jettyVersion}",
-		        "org.eclipse.jetty:jetty-jsp:$jettyVersion") {
+		        "org.eclipse.jetty:jetty-jsp:$jettyVersion",
+		        "org.eclipse.jetty:jetty-plus:$jettyVersion",
+		        "org.eclipse.jetty:jetty-security:${jettyVersion}",
+		        "org.eclipse.jetty:jetty-server:$jettyVersion",
+		        "org.eclipse.jetty:jetty-servlet:${jettyVersion}",
+		        "org.eclipse.jetty:jetty-util:$jettyVersion",
+		        "org.eclipse.jetty:jetty-webapp:${jettyVersion}",
+				  "org.eclipse.jetty:jetty-websocket:${jettyVersion}") {
 			excludes 'ant', 'com.sun.el', 'commons-el', 'derby', 'javax.activation', 'javax.el',
-			         'javax.mail.glassfish', 'javax.servlet', 'javax.servlet.jsp', 'javax.servlet.jsp.jstl',
+			         'javax.mail.glassfish', 'javax.servlet.jsp', 'javax.servlet.jsp.jstl',
 			         'javax.transaction', 'jcl104-over-slf4j', 'jetty-jmx', 'jetty-io',
 			         'jetty-test-helper', 'jetty-xml', 'junit', 'mockito-core', 'org.eclipse.jdt.core',
 			         'org.apache.jasper.glassfish', 'org.apache.taglibs.standard.glassfish', 'slf4j-api',
-			         'slf4j-jdk14', 'slf4j-simple', 'xercesImpl', 'xmlParserAPIs'
+			         'slf4j-jdk14', 'slf4j-simple', 'xercesImpl'
+			excludes(group: 'org.eclipse.jetty.orbit', name: 'javax.servlet')
 		}
 	}
 }
