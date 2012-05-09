@@ -30,15 +30,20 @@ grails.project.dependency.resolution = {
 		        "org.eclipse.jetty:jetty-util:$jettyVersion",
 		        "org.eclipse.jetty:jetty-webapp:${jettyVersion}",
 				  "org.eclipse.jetty:jetty-websocket:${jettyVersion}") {
-			excludes 'ant', 'com.sun.el', 'commons-el', 'derby', 'javax.el', 'javax.servlet.jsp',
-			         'javax.servlet.jsp.jstl', 'javax.transaction', 'jcl104-over-slf4j', 'jetty-jmx',
+			excludes 'ant', 'commons-el', 'derby', 'jcl104-over-slf4j', 'jetty-jmx',
 			         'jetty-io', 'jetty-test-helper', 'jetty-xml', 'junit', 'mockito-core',
-			         'org.eclipse.jdt.core', 'org.apache.jasper.glassfish',
-			         'org.apache.taglibs.standard.glassfish', 'slf4j-api', 'slf4j-jdk14', 'slf4j-simple',
-			         'xercesImpl'
+			         'slf4j-api', 'slf4j-jdk14', 'slf4j-simple', 'xercesImpl'
+			excludes(group: 'org.eclipse.jetty.orbit', name: 'com.sun.el')
 			excludes(group: 'org.eclipse.jetty.orbit', name: 'javax.activation')
+			excludes(group: 'org.eclipse.jetty.orbit', name: 'javax.el')
 			excludes(group: 'org.eclipse.jetty.orbit', name: 'javax.mail.glassfish')
 			excludes(group: 'org.eclipse.jetty.orbit', name: 'javax.servlet')
+			excludes(group: 'org.eclipse.jetty.orbit', name: 'javax.servlet.jsp')
+			excludes(group: 'org.eclipse.jetty.orbit', name: 'javax.servlet.jsp.jstl')
+			excludes(group: 'org.eclipse.jetty.orbit', name: 'javax.transaction')
+			excludes(group: 'org.eclipse.jetty.orbit', name: 'org.apache.jasper.glassfish')
+			excludes(group: 'org.eclipse.jetty.orbit', name: 'org.apache.taglibs.standard.glassfish')
+			excludes(group: 'org.eclipse.jetty.orbit', name: 'org.eclipse.jdt.core')
 		}
 	}
 }
