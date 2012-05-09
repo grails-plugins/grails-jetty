@@ -33,7 +33,7 @@ grails.project.dependency.resolution = {
 			excludes 'ant', 'commons-el', 'derby', 'jcl104-over-slf4j', 'jetty-jmx',
 			         'jetty-io', 'jetty-test-helper', 'jetty-xml', 'junit', 'mockito-core',
 			         'slf4j-api', 'slf4j-jdk14', 'slf4j-simple', 'xercesImpl'
-			excludes(group: 'org.eclipse.jetty.orbit', ext: 'orbit')
+			exclude(group: 'org.eclipse.jetty.orbit', ext: 'orbit')
 		}
 	}
 }
