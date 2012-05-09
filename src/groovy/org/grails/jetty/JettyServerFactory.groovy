@@ -1,4 +1,4 @@
-/* Copyright 2004-2005 Graeme Rocher
+/* Copyright 2012 SpringSource.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,22 @@
  */
 package org.grails.jetty
 
-
-import grails.web.container.EmbeddableServerFactory;
-import grails.web.container.EmbeddableServer;
+import grails.web.container.EmbeddableServerFactory
+import grails.web.container.EmbeddableServer
 
 /**
- * A factory that creates Jetty servers
+ * Creates Jetty servers.
  *
  * @author Graeme Rocher
  * @since 1.2
- *
- *        <p/>
- *        Created: Jan 7, 2009
  */
-public class JettyServerFactory implements EmbeddableServerFactory {
+class JettyServerFactory implements EmbeddableServerFactory {
 
+	EmbeddableServer createInline(String basedir, String webXml, String contextPath, ClassLoader classLoader) {
+		new JettyServer(basedir, webXml, contextPath, classLoader)
+	}
 
-    public EmbeddableServer createInline(String basedir, String webXml, String contextPath, ClassLoader classLoader) {
-        return new JettyServer(basedir, webXml, contextPath, classLoader);
-    }
-
-    public EmbeddableServer createForWAR(String warPath, String contextPath) {
-        return new JettyServer(warPath, contextPath);
-    }
+	EmbeddableServer createForWAR(String warPath, String contextPath) {
+		new JettyServer(warPath, contextPath)
+	}
 }
