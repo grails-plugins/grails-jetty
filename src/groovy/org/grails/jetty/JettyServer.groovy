@@ -16,6 +16,7 @@ package org.grails.jetty
 
 import grails.util.BuildSettings
 import grails.util.BuildSettingsHolder
+import grails.util.PluginBuildSettings
 import grails.web.container.EmbeddableServer
 
 import org.eclipse.jetty.plus.webapp.EnvConfiguration
@@ -160,21 +161,28 @@ class JettyServer implements EmbeddableServer {
 		// it from Grails to the project work directory (if it's not already there)
 		def webDefaults = new File("${buildSettings.projectWorkDir}/webdefault.xml")
 		if (!webDefaults.exists()) {
-			FileCopyUtils.copy(
-					grailsResource("conf/webdefault.xml").inputStream,
-					new FileOutputStream(webDefaults.path))
+			PluginBuildSettings pluginSettings = new PluginBuildSettings(buildSettings)
+			
+			def webDefaultInPluginPath = pluginSettings.getPluginDirForName("jetty").file.canonicalPath
+			new File("$webDefaultInPluginPath/grails-app/conf/webdefault.xml").withInputStream { input ->
+				FileCopyUtils.copy(
+						input,
+						new FileOutputStream(webDefaults.path))
+				
+			}
 		}
 
 		def webContext = new WebAppContext(webappRoot, contextPath)
 		def configurations = [
 			WebInfConfiguration,
-			Configuration,
+/*			Configuration,*/
 			JettyWebXmlConfiguration,
 			TagLibConfiguration
 		]*.newInstance()
 		def jndiConfig = new EnvConfiguration()
-		if (grailsConfig.grails.development.jetty.env) {
-			def res = new FileSystemResource(grailsConfig.grails.development.jetty.env.toString())
+		def  grailsJndi = grailsConfig?.grails?.development?.jetty?.env
+		if (grailsJndi) {
+			def res = new FileSystemResource(grailsJndi.toString())
 			if (res) {
 				jndiConfig.setJettyEnvXml(res.URL)
 			}
@@ -184,6 +192,7 @@ class JettyServer implements EmbeddableServer {
 		webContext.setDefaultsDescriptor(webDefaults.path)
 		webContext.setClassLoader(classLoader)
 		webContext.setDescriptor(webXml)
+		System.setProperty("TomcatKillSwitch.active", "true"); // workaround to prevent server exiting
 		return webContext
 	}
 
