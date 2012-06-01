@@ -20,24 +20,23 @@ import grails.util.PluginBuildSettings
 import grails.web.container.EmbeddableServer
 
 import org.eclipse.jetty.plus.webapp.EnvConfiguration
+import org.eclipse.jetty.plus.webapp.PlusConfiguration
 import org.eclipse.jetty.server.Connector
-import org.eclipse.jetty.server.nio.SelectChannelConnector
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.ssl.SslSocketConnector
-import org.eclipse.jetty.webapp.Configuration
+import org.eclipse.jetty.webapp.FragmentConfiguration
+import org.eclipse.jetty.webapp.MetaInfConfiguration
 import org.eclipse.jetty.webapp.TagLibConfiguration
 import org.eclipse.jetty.webapp.JettyWebXmlConfiguration
 import org.eclipse.jetty.webapp.WebAppContext
 import org.eclipse.jetty.webapp.WebInfConfiguration
-import org.springframework.core.io.ClassPathResource
+import org.eclipse.jetty.webapp.WebXmlConfiguration
 import org.springframework.core.io.FileSystemResource
 import org.springframework.util.Assert
 import org.springframework.util.FileCopyUtils
 
 /**
  * An implementation of the EmbeddableServer interface for Jetty.
- *
- * @see EmbeddableServer
  *
  * @author Graeme Rocher
  * @since 1.2
@@ -60,7 +59,7 @@ class JettyServer implements EmbeddableServer {
 	 * Creates a new JettyServer for the given war and context path
 	 */
 	JettyServer(String warPath, String contextPath) {
-		initialize()
+		this()
 		context = new WebAppContext(war: warPath, contextPath: contextPath)
 	}
 
@@ -73,71 +72,45 @@ class JettyServer implements EmbeddableServer {
 	 * @classLoader The class loader to use
 	 */
 	JettyServer(String basedir, String webXml, String contextPath, ClassLoader classLoader) {
-		initialize()
-		context = createStandardContext(basedir, webXml, contextPath, classLoader)
+		this()
+		createStandardContext basedir, webXml, contextPath, classLoader
 	}
 
-	/**
-	 * Initializes the JettyServer class
-	 */
-	protected void initialize() {
+	protected JettyServer() {
 		buildSettings = BuildSettingsHolder.getSettings()
 
 		keystore = "$buildSettings.grailsWorkDir/ssl/keystore"
 		keystoreFile = new File(keystore)
-		keyPassword = "123456"
+		keyPassword = '123456'
 
-		System.setProperty('org.eclipse.jetty.xml.XmlParser.NotValidating', 'true')
+		System.setProperty 'org.eclipse.jetty.xml.XmlParser.NotValidating', 'true'
 	}
 
-	/**
-	 * @see EmbeddableServer#start()
-	 */
-	void start() { start DEFAULT_PORT }
-
-	/**
-	 * @see EmbeddableServer#start(int)
-	 */
 	void start(int port) {
-		assertState()
 		start DEFAULT_HOST, port
 	}
 
-	/**
-	 * @see EmbeddableServer#start(String, int)
-	 */
-	void start (String host, int port) {
-		startServer configureHttpServer(context, port, host)
-	}
-
-	/**
-	 * @see EmbeddableServer#startSecure()
-	 */
-	void startSecure() { startSecure DEFAULT_SECURE_PORT }
-
-	/**
-	 * @see EmbeddableServer#startSecure(int)
-	 */
-	void startSecure(int httpsPort) {
+	void start(String host = DEFAULT_HOST, int port = DEFAULT_PORT) {
 		assertState()
-		startSecure DEFAULT_HOST, DEFAULT_PORT, httpsPort
+		configureHttpServer context, port, host
+		startServer()
 	}
 
-	void startSecure(String host, int httpPort, int httpsPort) {
-		startServer configureHttpsServer(context, httpPort, httpsPort, host)
+	void startSecure(int port) {
+		startSecure DEFAULT_HOST, port, DEFAULT_SECURE_PORT
 	}
 
-	/**
-	 * @see EmbeddableServer#stop()
-	 */
+	void startSecure(String host = DEFAULT_HOST, int httpPort = DEFAULT_PORT, int httpsPort = DEFAULT_SECURE_PORT) {
+		assertState()
+		configureHttpsServer context, httpPort, httpsPort, host
+		startServer()
+	}
+
 	void stop() {
 		assertState()
 		grailsServer.stop()
 	}
 
-	/**
-	 * @see EmbeddableServer#restart()
-	 */
 	void restart() {
 		assertState()
 		stop()
@@ -145,98 +118,95 @@ class JettyServer implements EmbeddableServer {
 	}
 
 	/**
-	 * Starts the given Grails server
+	 * Starts the configured Grails server
 	 */
-	protected startServer(Server grailsServer) {
-		eventListener?.event("ConfigureJetty", [grailsServer])
+	protected void startServer() {
+		eventListener?.event('ConfigureJetty', [grailsServer])
 		grailsServer.start()
 	}
 
 	/**
 	 * Creates a standard WebAppContext from the given arguments
 	 */
-	protected WebAppContext createStandardContext(String webappRoot, String webXml,
-	                                              String contextPath, ClassLoader classLoader) {
-		// Jetty requires a "defaults descriptor" on the filesystem. So we copy
-		// it from Grails to the project work directory (if it's not already there)
-		def webDefaults = new File("${buildSettings.projectWorkDir}/webdefault.xml")
+	protected void createStandardContext(String webappRoot, String webXml,
+	                                     String contextPath, ClassLoader classLoader) {
+		// Jetty requires a 'defaults descriptor' on the filesystem
+		File webDefaults = new File(buildSettings.projectWorkDir, 'webdefault.xml')
 		if (!webDefaults.exists()) {
 			PluginBuildSettings pluginSettings = new PluginBuildSettings(buildSettings)
-			
-			def webDefaultInPluginPath = pluginSettings.getPluginDirForName("jetty").file.canonicalPath
-			new File("$webDefaultInPluginPath/grails-app/conf/webdefault.xml").withInputStream { input ->
-				FileCopyUtils.copy(
-						input,
-						new FileOutputStream(webDefaults.path))
-				
-			}
+			File pluginDir = pluginSettings.getPluginDirForName('jetty').file
+			FileCopyUtils.copy new File(pluginDir, 'grails-app/conf/webdefault.xml'), webDefaults
 		}
 
-		def webContext = new WebAppContext(webappRoot, contextPath)
+		context = new WebAppContext(webappRoot, contextPath)
+
 		def configurations = [
 			WebInfConfiguration,
-/*			Configuration,*/
+			WebXmlConfiguration,
+			MetaInfConfiguration,
+			FragmentConfiguration,
+			EnvConfiguration,
+			PlusConfiguration,
 			JettyWebXmlConfiguration,
-			TagLibConfiguration
-		]*.newInstance()
-		def jndiConfig = new EnvConfiguration()
-		def  grailsJndi = grailsConfig?.grails?.development?.jetty?.env
+			TagLibConfiguration]*.newInstance()
+
+		def grailsJndi = grailsConfig?.grails?.development?.jetty?.env
 		if (grailsJndi) {
 			def res = new FileSystemResource(grailsJndi.toString())
 			if (res) {
-				jndiConfig.setJettyEnvXml(res.URL)
+				EnvConfiguration jndiConfig = configurations[1]
+				jndiConfig.jettyEnvXml = res.URL
 			}
 		}
-		configurations.add(1, jndiConfig)
-		webContext.configurations = configurations
-		webContext.setDefaultsDescriptor(webDefaults.path)
-		webContext.setClassLoader(classLoader)
-		webContext.setDescriptor(webXml)
-		System.setProperty("TomcatKillSwitch.active", "true"); // workaround to prevent server exiting
-		return webContext
+
+		context.configurations = configurations
+		context.defaultsDescriptor = webDefaults.path
+		context.classLoader = classLoader
+		context.descriptor = webXml
+
+		System.setProperty 'TomcatKillSwitch.active', 'true' // workaround to prevent server exiting
 	}
 
 	/**
 	 * Configures a new Jetty Server instance for the given WebAppContext
 	 */
-	protected Server configureHttpServer(WebAppContext context, int serverPort = DEFAULT_PORT,
-	                                     String serverHost = DEFAULT_HOST) {
-		Server server = new Server()
-		grailsServer = server
-		def connectors = [new SelectChannelConnector()]
-		connectors[0].setPort(serverPort)
+	protected void configureHttpServer(WebAppContext context, int serverPort = DEFAULT_PORT,
+	                                   String serverHost = DEFAULT_HOST) {
+
+		grailsServer = new Server(serverPort)
 		if (serverHost) {
-			connectors[0].setHost(serverHost)
+			grailsServer.connectors[0].host = serverHost
 		}
-		server.setConnectors((Connector[]) connectors)
-		server.setHandler(context)
-		return server
+
+		grailsServer.handler = context
 	}
 
 	/**
 	 * Configures a secure HTTPS server
 	 */
-	protected configureHttpsServer(WebAppContext context, int httpPort = DEFAULT_PORT,
-	                               int httpsPort = DEFAULT_SECURE_PORT, String serverHost = DEFAULT_HOST ) {
-		def server = configureHttpServer(context, httpPort, serverHost)
-		if (!(keystoreFile.exists())) {
+	protected void configureHttpsServer(WebAppContext context, int httpPort = DEFAULT_PORT,
+				int httpsPort = DEFAULT_SECURE_PORT, String serverHost = DEFAULT_HOST ) {
+
+		configureHttpServer context, httpPort, serverHost
+
+		if (!keystoreFile.exists()) {
 			createSSLCertificate()
 		}
+
 		def secureListener = new SslSocketConnector()
-		secureListener.setPort(httpsPort)
+		secureListener.port = httpsPort
 		if (serverHost) {
-			secureListener.setHost(serverHost)
+			secureListener.host = serverHost
 		}
-		secureListener.setMaxIdleTime(50000)
-		secureListener.setPassword(keyPassword)
-		secureListener.setKeyPassword(keyPassword)
-		secureListener.setKeystore(keystore)
-		secureListener.setNeedClientAuth(false)
-		secureListener.setWantClientAuth(true)
-		def connectors = server.getConnectors().toList()
-		connectors.add(secureListener)
-		server.setConnectors(connectors.toArray(new Connector[0]))
-		return server
+		secureListener.maxIdleTime = 50000
+		secureListener.password = keyPassword
+		secureListener.keyPassword = keyPassword
+		secureListener.keystore = keystore
+		secureListener.needClientAuth = false
+		secureListener.wantClientAuth = true
+		List connectors = grailsServer.connectors
+		connectors << secureListener
+		grailsServer.connectors = connectors as Connector[]
 	}
 
 	/**
@@ -249,26 +219,18 @@ class JettyServer implements EmbeddableServer {
 		}
 
 		String[] keytoolArgs = [
-			"-genkey",
-			"-alias",
-			"localhost",
-			"-dname",
-			"CN=localhost,OU=Test,O=Test,C=US",
-			"-keyalg",
-			"RSA",
-			"-validity",
-			"365",
-			"-storepass",
-			"key",
-			"-keystore",
-			"${keystore}",
-			"-storepass",
-			"${keyPassword}",
-			"-keypass",
-			"${keyPassword}"
+			'-genkey',
+			'-alias',     'localhost',
+			'-dname',     'CN=localhost,OU=Test,O=Test,C=US',
+			'-keyalg',    'RSA',
+			'-validity',  '365',
+			'-storepass', 'key',
+			'-keystore',  keystore,
+			'-storepass', keyPassword,
+			'-keypass',   keyPassword
 		]
 
-		getKeyToolClass().main(keytoolArgs)
+		getKeyToolClass().main keytoolArgs
 
 		println 'Created SSL Certificate.'
 	}
@@ -283,15 +245,7 @@ class JettyServer implements EmbeddableServer {
 		}
 	}
 
-	protected assertState() {
-		Assert.state(context != null, "The WebAppContext has not been initialized!")
-	}
-
-	protected grailsResource(String path) {
-		if (buildSettings.grailsHome) {
-			return new FileSystemResource("$buildSettings.grailsHome/$path")
-		}
-
-		new ClassPathResource(path)
+	protected void assertState() {
+		Assert.state context != null, 'The WebAppContext has not been initialized!'
 	}
 }
