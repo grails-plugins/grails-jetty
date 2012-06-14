@@ -140,6 +140,9 @@ class JettyServer implements EmbeddableServer {
 
 		context = new WebAppContext(webappRoot, contextPath)
 
+		setSystemProperty 'java.naming.factory.url.pkgs', 'org.eclipse.jetty.jndi'
+		setSystemProperty 'java.naming.factory.initial', 'org.eclipse.jetty.jndi.InitialContextFactory'
+
 		def configurations = [
 			WebInfConfiguration,
 			WebXmlConfiguration,
@@ -153,8 +156,8 @@ class JettyServer implements EmbeddableServer {
 		def grailsJndi = grailsConfig?.grails?.development?.jetty?.env
 		if (grailsJndi) {
 			def res = new FileSystemResource(grailsJndi.toString())
-			if (res) {
-				EnvConfiguration jndiConfig = configurations[1]
+			if (res.exists()) {
+				EnvConfiguration jndiConfig = configurations[4]
 				jndiConfig.jettyEnvXml = res.URL
 			}
 		}
@@ -165,6 +168,12 @@ class JettyServer implements EmbeddableServer {
 		context.descriptor = webXml
 
 		System.setProperty 'TomcatKillSwitch.active', 'true' // workaround to prevent server exiting
+	}
+
+	protected void setSystemProperty(String name, String value) {
+		if (!System.getProperty(name)) {
+			System.setProperty name, value
+		}
 	}
 
 	/**
