@@ -84,6 +84,8 @@ class JettyServer implements EmbeddableServer {
 		keyPassword = '123456'
 
 		System.setProperty 'org.eclipse.jetty.xml.XmlParser.NotValidating', 'true'
+
+		System.setProperty 'TomcatKillSwitch.active', 'true' // workaround to prevent server exiting
 	}
 
 	void start(int port) {
@@ -166,8 +168,6 @@ class JettyServer implements EmbeddableServer {
 		context.defaultsDescriptor = webDefaults.path
 		context.classLoader = classLoader
 		context.descriptor = webXml
-
-		System.setProperty 'TomcatKillSwitch.active', 'true' // workaround to prevent server exiting
 	}
 
 	protected void setSystemProperty(String name, String value) {
