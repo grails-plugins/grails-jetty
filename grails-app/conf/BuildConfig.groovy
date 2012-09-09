@@ -13,12 +13,6 @@ grails.project.dependency.resolution = {
 		mavenCentral()
 	}
 
-	plugins {
-		build(':release:2.0.3', ':rest-client-builder:1.0.2') {
-			export = false
-		}
-	}
-
 	dependencies {
 
 		String jettyVersion = '7.6.0.v20120127'
@@ -29,5 +23,11 @@ grails.project.dependency.resolution = {
 
 		// needed for JSP compilation
 		runtime 'org.eclipse.jdt.core.compiler:ecj:3.6.2'
+	}
+
+	plugins {
+		build(':release:2.0.4', ':rest-client-builder:1.0.2') {
+			export = false
+		}
 	}
 }
