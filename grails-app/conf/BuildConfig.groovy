@@ -22,7 +22,7 @@ grails.project.dependency.resolution = {
 		}
 
 		// needed for JSP compilation
-		runtime 'org.eclipse.jdt.core.compiler:ecj:3.6.2'
+		runtime 'org.eclipse.jdt.core.compiler:ecj:3.7.2'
 	}
 
 	plugins {
