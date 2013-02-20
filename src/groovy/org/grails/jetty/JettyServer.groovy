@@ -19,15 +19,16 @@ import grails.util.BuildSettingsHolder
 import grails.util.PluginBuildSettings
 import grails.web.container.EmbeddableServer
 
+import org.codehaus.groovy.grails.cli.support.GrailsBuildEventListener
 import org.eclipse.jetty.plus.webapp.EnvConfiguration
 import org.eclipse.jetty.plus.webapp.PlusConfiguration
 import org.eclipse.jetty.server.Connector
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.ssl.SslSocketConnector
 import org.eclipse.jetty.webapp.FragmentConfiguration
+import org.eclipse.jetty.webapp.JettyWebXmlConfiguration
 import org.eclipse.jetty.webapp.MetaInfConfiguration
 import org.eclipse.jetty.webapp.TagLibConfiguration
-import org.eclipse.jetty.webapp.JettyWebXmlConfiguration
 import org.eclipse.jetty.webapp.WebAppContext
 import org.eclipse.jetty.webapp.WebInfConfiguration
 import org.eclipse.jetty.webapp.WebXmlConfiguration
@@ -123,7 +124,13 @@ class JettyServer implements EmbeddableServer {
 	 * Starts the configured Grails server
 	 */
 	protected void startServer() {
-		eventListener?.event('ConfigureJetty', [grailsServer])
+		if (eventListener instanceof GrailsBuildEventListener) {
+			eventListener.triggerEvent('ConfigureJetty', [grailsServer])
+		}
+		else {
+			// pre-2.2
+			eventListener?.event('ConfigureJetty', [grailsServer])
+		}
 		grailsServer.start()
 	}
 
