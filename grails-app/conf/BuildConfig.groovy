@@ -15,14 +15,10 @@ grails.project.dependency.resolution = {
 
 	dependencies {
 
-		String jettyVersion = '8.1.8.v20121106'
+		String jettyVersion = '8.1.13.v20130916'
 
         runtime ("org.eclipse.jetty.aggregate:jetty-all:$jettyVersion") {
             exclude "javax.servlet"
-        }
-
-        runtime ("org.eclipse.jetty.orbit:javax.servlet:3.0.0.v201112011016")  {
-            addDependencyArtifact("*", new org.apache.ivy.core.module.descriptor.DefaultDependencyArtifactDescriptor(delegate, "jive", "jar", "jar", null, null))
         }
 
 		// needed for JSP compilation
