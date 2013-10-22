@@ -21,10 +21,6 @@ grails.project.dependency.resolution = {
             exclude "javax.servlet"
         }
 
-        runtime ("org.eclipse.jetty.orbit:javax.servlet:3.0.0.v201112011016")  {
-            addDependencyArtifact("*", new org.apache.ivy.core.module.descriptor.DefaultDependencyArtifactDescriptor(delegate, "jive", "jar", "jar", null, null))
-        }
-
 		// needed for JSP compilation
 		runtime 'org.eclipse.jdt.core.compiler:ecj:3.7.2'
 	}
