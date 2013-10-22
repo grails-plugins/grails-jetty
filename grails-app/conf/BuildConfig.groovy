@@ -15,7 +15,7 @@ grails.project.dependency.resolution = {
 
 	dependencies {
 
-		String jettyVersion = '8.1.8.v20121106'
+		String jettyVersion = '8.1.13.v20130916'
 
         runtime ("org.eclipse.jetty.aggregate:jetty-all:$jettyVersion") {
             exclude "javax.servlet"
