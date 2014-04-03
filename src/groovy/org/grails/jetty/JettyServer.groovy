@@ -23,8 +23,13 @@ import org.codehaus.groovy.grails.cli.support.GrailsBuildEventListener
 import org.eclipse.jetty.plus.webapp.EnvConfiguration
 import org.eclipse.jetty.plus.webapp.PlusConfiguration
 import org.eclipse.jetty.server.Connector
+import org.eclipse.jetty.server.HttpConfiguration
+import org.eclipse.jetty.server.HttpConnectionFactory
+import org.eclipse.jetty.server.SecureRequestCustomizer
 import org.eclipse.jetty.server.Server
-import org.eclipse.jetty.server.ssl.SslSocketConnector
+import org.eclipse.jetty.server.ServerConnector
+import org.eclipse.jetty.server.SslConnectionFactory
+import org.eclipse.jetty.util.ssl.SslContextFactory
 import org.eclipse.jetty.webapp.FragmentConfiguration
 import org.eclipse.jetty.webapp.JettyWebXmlConfiguration
 import org.eclipse.jetty.webapp.MetaInfConfiguration
@@ -208,20 +213,39 @@ class JettyServer implements EmbeddableServer {
             createSSLCertificate()
         }
 
-        def secureListener = new SslSocketConnector()
-        secureListener.port = httpsPort
+        SslContextFactory sslContextFactory = new SslContextFactory();
+        sslContextFactory.keyStorePath = keystoreFile.path
+        sslContextFactory.keyStorePassword = keyPassword
+        sslContextFactory.keyManagerPassword = keyPassword
+        sslContextFactory.needClientAuth = false
+        sslContextFactory.wantClientAuth = true
+
+        HttpConfiguration httpsConfig = buildHttpsConfig(httpsPort)
+
+        ServerConnector httpsConnector = new ServerConnector(grailsServer, new SslConnectionFactory(sslContextFactory, 'http/1.1'), new HttpConnectionFactory(httpsConfig))
+
+        httpsConnector.port = httpsPort
+        httpsConnector.idleTimeout = 50000
+
         if (serverHost) {
-            secureListener.host = serverHost
+            httpsConnector.host = serverHost
         }
-        secureListener.maxIdleTime = 50000
-        secureListener.password = keyPassword
-        secureListener.keyPassword = keyPassword
-        secureListener.keystore = keystore
-        secureListener.needClientAuth = false
-        secureListener.wantClientAuth = true
+
         List connectors = grailsServer.connectors
-        connectors << secureListener
+        connectors << httpsConnector
         grailsServer.connectors = connectors as Connector[]
+    }
+
+    private HttpConfiguration buildHttpsConfig(int httpsPort) {
+        HttpConfiguration httpConfig = new HttpConfiguration();
+        httpConfig.secureScheme = 'https'
+        httpConfig.securePort = httpsPort
+        httpConfig.outputBufferSize = 32768
+
+        HttpConfiguration httpsConfig = new HttpConfiguration(httpConfig)
+        httpsConfig.addCustomizer(new SecureRequestCustomizer())
+
+        httpsConfig
     }
 
     /**
