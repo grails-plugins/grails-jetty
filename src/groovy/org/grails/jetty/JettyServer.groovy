@@ -85,9 +85,9 @@ class JettyServer implements EmbeddableServer {
     protected JettyServer() {
         buildSettings = BuildSettingsHolder.getSettings()
 
-        keystore = "$buildSettings.grailsWorkDir/ssl/keystore"
+        keystore = buildSettings.config.grails.jetty.keystorePath ?: "$buildSettings.grailsWorkDir/ssl/keystore"
         keystoreFile = new File(keystore)
-        keyPassword = '123456'
+        keyPassword = buildSettings.config.grails.jetty.keystorePassword ?: '123456'
 
         System.setProperty 'org.eclipse.jetty.xml.XmlParser.NotValidating', 'true'
 

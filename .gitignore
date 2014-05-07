@@ -6,3 +6,5 @@ plugin.xml
 /docs/
 /.idea/
 *.iml
+*.tld
+*.sha1
