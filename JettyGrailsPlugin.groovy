@@ -28,5 +28,5 @@ class JettyGrailsPlugin {
 		[name: 'Adarsh Ramamurthy', email: 'adarsh.ramamurthy@gmail.com'],
 	]
 	def issueManagement = [system: 'JIRA', url: 'http://jira.grails.org/browse/GPJETTY']
-	def scm = [url: 'https://github.com/radarsh/grails-jetty']
+	def scm = [url: 'https://github.com/grails-plugins/grails-jetty']
 }
