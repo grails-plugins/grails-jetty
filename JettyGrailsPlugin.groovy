@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 class JettyGrailsPlugin {
-	def version = "2.0.3"
-	def grailsVersion = "2.0 > *"
+	def version = "3.0.0-SNAPSHOT"
+	def grailsVersion = "2.3.7 > *"
 	def scopes = [excludes: 'war']
 	def title = "Jetty Plugin"
 	def description = 'Makes Jetty the development time container for Grails'
@@ -24,7 +24,8 @@ class JettyGrailsPlugin {
 	def organization = [name: 'SpringSource', url: 'http://www.springsource.org/']
 	def developers = [
 		[name: 'Graeme Rocher', email: 'graeme.rocher@springsource.com'],
-		[name: 'Burt Beckwith', email: 'beckwithb@vmware.com']
+		[name: 'Burt Beckwith', email: 'beckwithb@vmware.com'],
+		[name: 'Adarsh Ramamurthy', email: 'adarsh.ramamurthy@gmail.com'],
 	]
 	def issueManagement = [system: 'JIRA', url: 'http://jira.grails.org/browse/GPJETTY']
 	def scm = [url: 'https://github.com/grails-plugins/grails-jetty']
