@@ -40,7 +40,7 @@ if [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_REPO_SLUG == "grails-plugins/grails-
   # fi
 
 
-  #./grailsw publish-plugin --no-scm --allow-overwrite --non-interactive
+  ./grailsw publish-plugin --no-scm --allow-overwrite --non-interactive
 else
   echo "Not on master branch, so not publishing"
   echo "TRAVIS_BRANCH: $TRAVIS_BRANCH"
