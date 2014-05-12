@@ -3,3 +3,7 @@ eventGenerateWebXmlEnd = {
 	packagePluginsForWar("${basedir}/web-app")
 	System.setProperty("grails.server.factory", "org.grails.jetty.JettyServerFactory")
 }
+
+eventSetClasspath = {
+	System.setProperty("grails.server.factory", "org.grails.jetty.JettyServerFactory")
+}
