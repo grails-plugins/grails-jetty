@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 class JettyGrailsPlugin {
-	def version = "3.0.0-SNAPSHOT"
+	def version = "3.0.0"
 	def grailsVersion = "2.3.7 > *"
 	def scopes = [excludes: 'war']
 	def title = "Jetty Plugin"
